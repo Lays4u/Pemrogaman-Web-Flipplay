@@ -45,6 +45,12 @@ function formatDetails(item) {
   return `${item.chapters ?? '?'} bab${item.volumes ? ` · ${item.volumes} volume` : ''}`;
 }
 
+function getAniListUrl(item) {
+  if (item.site_url) return item.site_url;
+  const section = item.type === 'manga' ? 'manga' : 'anime';
+  return `https://anilist.co/search/${section}?search=${encodeURIComponent(item.title)}`;
+}
+
 function renderMedia() {
   const filtered = mediaData.filter(item => {
     const isCollected = userCollectionIds.has(item.id);
@@ -80,10 +86,11 @@ function renderMedia() {
       const badgeLabel = item.type === 'anime' ? 'Anime' : 'Manga';
       const actionLabel = item.type === 'anime' ? 'Tonton' : 'Baca';
       const coverUrl = item.cover_image || DEFAULT_COVER;
+      const anilistUrl = getAniListUrl(item);
 
       return `
         <article class="group relative flex flex-col justify-between overflow-hidden rounded-3xl bg-white shadow-xl ring-1 ring-ink/15 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl">
-          <div onclick="openDetailModal(${item.id})" class="relative h-60 w-full cursor-pointer overflow-hidden bg-slate-100">
+          <a href="${escapeHtml(anilistUrl)}" target="_blank" rel="noopener noreferrer" class="relative block h-60 w-full overflow-hidden bg-slate-100">
             <img src="${escapeHtml(coverUrl)}" alt="${escapeHtml(item.title)}" class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" loading="lazy">
             <span class="absolute left-3 top-3 rounded-full bg-ink/80 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
               ${actionLabel}
@@ -91,12 +98,12 @@ function renderMedia() {
             <span class="absolute right-3 top-3 rounded-full bg-sun px-2.5 py-1 text-xs font-bold text-ink">
               ${badgeLabel}
             </span>
-          </div>
+          </a>
           <div class="flex flex-1 flex-col justify-between p-5">
             <div>
-              <h3 onclick="openDetailModal(${item.id})" class="cursor-pointer font-display text-lg font-extrabold text-ink transition-colors group-hover:text-iris">
+              <a href="${escapeHtml(anilistUrl)}" target="_blank" rel="noopener noreferrer" class="block font-display text-lg font-extrabold text-ink transition-colors group-hover:text-iris">
                 ${escapeHtml(item.title)}
-              </h3>
+              </a>
               <p class="mt-1 text-xs font-semibold text-ink/60">${escapeHtml(item.genre)}</p>
             </div>
             <div class="mt-4 space-y-3 border-t border-ink/10 pt-3">
@@ -104,7 +111,7 @@ function renderMedia() {
                 <span class="text-xs font-bold text-iris">${escapeHtml(formatDetails(item))}</span>
                 <span class="text-xs font-bold text-ink">★ ${escapeHtml(item.score ?? 0)}%</span>
               </div>
-              <div class="flex items-center gap-1.5">
+              <div class="flex flex-wrap items-center gap-1.5">
                 <button
                   type="button"
                   onclick="toggleCollection(${item.id})"
@@ -114,6 +121,13 @@ function renderMedia() {
                       : 'bg-ink text-white hover:bg-iris'
                   }">
                   ${isCollected ? '✓ Di Koleksi' : '+ Koleksi'}
+                </button>
+                <button
+                  type="button"
+                  onclick="openDetailModal(${item.id})"
+                  title="Lihat detail & pengguna koleksi"
+                  class="rounded-full border border-ink/15 px-2.5 py-2 text-xs font-semibold text-ink/70 transition hover:bg-mist hover:text-iris">
+                  Info
                 </button>
                 <button
                   type="button"
@@ -148,9 +162,7 @@ async function fetchUsers() {
         .join('');
       currentUserId = Number(userSelect.value) || 1;
     }
-  } catch (_) {
-    // Fallback jika endpoint users belum dimuat
-  }
+  } catch (_) {}
 }
 
 async function fetchUserCollection() {
@@ -252,9 +264,6 @@ async function deleteMedia(mediaId) {
   }
 }
 
-// ==========================================
-// MODAL TAMBAH & EDIT MEDIA (POST & PATCH)
-// ==========================================
 const mediaModal = document.getElementById('mediaModal');
 const mediaForm = document.getElementById('mediaForm');
 const mediaTypeSelect = document.getElementById('mediaType');
@@ -302,6 +311,8 @@ function openEditModal(mediaId) {
   document.getElementById('mediaChapters').value = item.chapters ?? '';
   document.getElementById('mediaVolumes').value = item.volumes ?? '';
   document.getElementById('mediaCover').value = item.cover_image ?? '';
+  const siteUrlInput = document.getElementById('mediaSiteUrl');
+  if (siteUrlInput) siteUrlInput.value = item.site_url ?? '';
 
   toggleTypeInputs(item.type);
   modalErrorMsg.classList.add('hidden');
@@ -319,6 +330,7 @@ if (mediaForm) {
     e.preventDefault();
     const editId = document.getElementById('editMediaId').value;
     const type = document.getElementById('mediaType').value;
+    const siteUrlInput = document.getElementById('mediaSiteUrl');
 
     const payload = {
       title: document.getElementById('mediaTitle').value.trim(),
@@ -335,6 +347,7 @@ if (mediaForm) {
         ? Number(document.getElementById('mediaVolumes').value)
         : null,
       cover_image: document.getElementById('mediaCover').value.trim() || null,
+      site_url: siteUrlInput ? (siteUrlInput.value.trim() || null) : null,
     };
 
     try {
@@ -368,9 +381,6 @@ if (mediaForm) {
   });
 }
 
-// ==========================================
-// MODAL DETAIL MEDIA + USERS (GET /api/media/{id})
-// ==========================================
 const detailModal = document.getElementById('detailModal');
 
 async function openDetailModal(mediaId) {
@@ -398,9 +408,7 @@ async function openDetailModal(mediaId) {
 
     detailModal.classList.remove('hidden');
     detailModal.classList.add('flex');
-  } catch (_) {
-    // Ignore
-  }
+  } catch (_) {}
 }
 
 function closeDetailModal() {
@@ -408,9 +416,6 @@ function closeDetailModal() {
   detailModal.classList.remove('flex');
 }
 
-// ==========================================
-// EVENT LISTENERS (Search, Category, Filter, Contact)
-// ==========================================
 let searchTimeout;
 if (searchInput) {
   searchInput.addEventListener('input', (e) => {

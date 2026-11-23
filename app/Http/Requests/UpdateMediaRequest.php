@@ -31,6 +31,7 @@ class UpdateMediaRequest extends FormRequest
             'chapters' => ['sometimes', 'nullable', 'integer', 'min:1'],
             'volumes' => ['sometimes', 'nullable', 'integer', 'min:1'],
             'cover_image' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'site_url' => ['sometimes', 'nullable', 'url', 'max:500'],
         ];
     }
 

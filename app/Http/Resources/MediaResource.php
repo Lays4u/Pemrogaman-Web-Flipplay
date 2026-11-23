@@ -19,6 +19,7 @@ class MediaResource extends JsonResource
             'chapters' => $this->chapters,
             'volumes' => $this->volumes,
             'cover_image' => $this->cover_image,
+            'site_url' => $this->site_url,
             'details' => $this->getDetails(),
             'users' => UserResource::collection($this->whenLoaded('users')),
             'created_at' => $this->created_at?->toISOString(),

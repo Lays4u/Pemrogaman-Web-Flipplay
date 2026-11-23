@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('chapters')->nullable();
             $table->unsignedInteger('volumes')->nullable();
             $table->string('cover_image', 500)->nullable();
+            $table->string('site_url', 500)->nullable();
             $table->timestamps();
         });
     }

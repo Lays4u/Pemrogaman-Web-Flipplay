@@ -21,6 +21,7 @@ class Media extends Model
         'chapters',
         'volumes',
         'cover_image',
+        'site_url',
     ];
 
     protected function casts(): array
@@ -33,18 +34,12 @@ class Media extends Model
         ];
     }
 
-    /**
-     * Relasi Many-to-Many: Media dimiliki dalam koleksi banyak pengguna.
-     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'media_user')
             ->withTimestamps();
     }
 
-    /**
-     * Representasi detail dari struktur OOP FlipPlay Modul 3.
-     */
     public function getDetails(): string
     {
         if ($this->type === 'anime') {

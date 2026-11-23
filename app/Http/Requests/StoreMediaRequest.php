@@ -22,6 +22,7 @@ class StoreMediaRequest extends FormRequest
             'chapters' => ['nullable', 'integer', 'min:1'],
             'volumes' => ['nullable', 'integer', 'min:1'],
             'cover_image' => ['nullable', 'string', 'max:500'],
+            'site_url' => ['nullable', 'url', 'max:500'],
         ];
     }
 
