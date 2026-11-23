@@ -1,0 +1,14 @@
+@keyframes progress {
+  from { width: 12%; }
+  to   { width: 72%; }
+}
+
+.progress-bar {
+  width: 72%;
+  animation: progress 6s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-bar { animation: none; }
+  html { scroll-behavior: auto; }
+}

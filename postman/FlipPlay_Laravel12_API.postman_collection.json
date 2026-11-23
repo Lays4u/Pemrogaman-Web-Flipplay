@@ -1,0 +1,333 @@
+{
+  "info": {
+    "name": "FlipPlay REST API (Laravel 12)",
+    "description": "Pengujian lengkap endpoint FlipPlay REST API mencakup skenario berhasil (Happy Path) dan skenario gagal (Validasi & Duplikasi).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. GET - Daftar Semua Media",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/media",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "media"
+          ]
+        }
+      }
+    },
+    {
+      "name": "2. GET - Cari Media Berdasarkan Judul (?title=)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/media?title=One",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "media"
+          ],
+          "query": [
+            {
+              "key": "title",
+              "value": "One"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "3. POST - Tambah Media Baru (Happy Path)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Black Clover\",\n  \"type\": \"anime\",\n  \"genre\": \"Action, Fantasy\",\n  \"score\": 85.4,\n  \"episodes\": 170\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/media",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "media"
+          ]
+        }
+      }
+    },
+    {
+      "name": "4. POST - Tambah Media Judul Kosong (Skenario Gagal 422)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"\",\n  \"type\": \"anime\",\n  \"genre\": \"Action\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/media",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "media"
+          ]
+        }
+      }
+    },
+    {
+      "name": "5. POST - Tambah Media Judul Duplikat (Skenario Gagal 422)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Shingeki no Kyojin\",\n  \"type\": \"anime\",\n  \"genre\": \"Action, Dark Fantasy\",\n  \"score\": 90.5,\n  \"episodes\": 89\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/media",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "media"
+          ]
+        }
+      }
+    },
+    {
+      "name": "6. GET - Detail Media Beserta Pengguna (whenLoaded)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/media/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "media",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "7. PATCH - Update Data Media",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"score\": 92.0,\n  \"episodes\": 90\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/media/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "media",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "8. GET - Koleksi Media Milik Pengguna",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/1/collections",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "collections"
+          ]
+        }
+      }
+    },
+    {
+      "name": "9. POST - Tambah Media ke Koleksi Pengguna (Happy Path)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"media_id\": 2\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/users/1/collections",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "collections"
+          ]
+        }
+      }
+    },
+    {
+      "name": "10. POST - Tambah Media Duplikat ke Koleksi Pengguna (Skenario Gagal 422)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"media_id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/users/1/collections",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "collections"
+          ]
+        }
+      }
+    },
+    {
+      "name": "11. DELETE - Hapus Media dari Koleksi Pengguna",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/1/collections/1",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "users",
+            "1",
+            "collections",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "12. DELETE - Hapus Media dari Sistem",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "{{base_url}}/media/4",
+          "host": [
+            "{{base_url}}"
+          ],
+          "path": [
+            "media",
+            "4"
+          ]
+        }
+      }
+    }
+  ]
+}
